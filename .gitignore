@@ -1,0 +1,5 @@
+# For pth files
+*.pth
+
+# for venv
+.venv/
