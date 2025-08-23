@@ -1,4 +1,4 @@
-```markdown
+
 ## Setup Instructions
 
 1. **Ensure Python 3.10 is installed:**
@@ -38,4 +38,3 @@
     ```bash
     pip install TTS
     ```
-```
