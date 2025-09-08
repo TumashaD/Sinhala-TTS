@@ -6,6 +6,20 @@ from TTS.tts.utils.text.tokenizer import TTSTokenizer
 from TTS.utils.audio import AudioProcessor
 from trainer import Trainer, TrainerArgs
 from TTS.tts.configs.shared_configs import CharactersConfig
+import torch
+
+# GPU optimizations for RTX 3050
+if torch.cuda.is_available():
+    torch.backends.cudnn.benchmark = True
+    torch.backends.cuda.matmul.allow_tf32 = True
+    torch.backends.cudnn.allow_tf32 = True
+
+# CPU optimizations
+os.environ["OMP_NUM_THREADS"] = "8" 
+os.environ["MKL_NUM_THREADS"] = "8"
+
+# Memory management
+torch.cuda.empty_cache()
 
 dataset_config = BaseDatasetConfig(
     formatter="ljspeech",  # use ljspeech-style metadata format
@@ -33,19 +47,28 @@ SINHALA_IPA_CHARS = [
 
 characters_string = "".join(SINHALA_IPA_CHARS)
 # Include ” and ‘ in punctuation"
-punctuation_string = ".,!?;:()-[]\"'“”‘’ \n\r\t" 
+punctuation_string = ".,!?;:=()-[]\"'“”‘’ \n\r\t" 
 
 output_path = "output/tacotron2-sinhala"
 
 # INITIALIZE THE TRAINING CONFIGURATION
 config = Tacotron2Config(
-    eval_batch_size=4,
-    num_loader_workers=2,
-    num_eval_loader_workers=2,
+    batch_size=16,
+    eval_batch_size=8,
+
+    mixed_precision=True,
+    use_grad_scaler=True,
+    allow_tf32=True,
+    cudnn_benchmark=True,
+
+    num_loader_workers=8,
+    num_eval_loader_workers=4,
+
     run_eval=True,
     test_delay_epochs=5,
-    batch_size=8,          # reduce for 6GB VRAM
-    epochs=1000,           # more training needed
+    epochs=1000, 
+
+    out_channels=80,  # Number of mel channels
 
     # Model parameters
     r=2,  
@@ -110,15 +133,11 @@ config = Tacotron2Config(
     test_sentences=[
         "ad̪ə pason pahojo d̪inəjəji. pason pahojo apə raʈəʈə at̪iʃəjə væd̪əgət̪ d̪inəjək.",
         "ad̪ə mamə kaʈuvəkin vid̪unaː lad̪d̪ə jamsə d̪uk vind̪im d̪ə, mase mə panvaːlə radʒət̪əme jud̪d̪əjəhi d̪iː iːjan vid̪inə lad̪d̪ə d̪uk vind̪iːvaː.",
-        "ad̪arməkarməjəhi ad̪arməkarməsaŋɲaː æt̪t̪iː nam d̪ukuɭaː ævæt̪ va.",
-        "anəkeː prəbəd̪eː vuː eː d̪arməjan kərehi d̪ə anəkaːkaːrə manəɲoː svəbaːvəjə vat̪i. saːmaːnjəjan eː sijalləʈə mə d̪armə rasəjaji kijənu læbə.",
-        "apə raʈə valaːvə saməŋɡə sasand̪ənə kələ it̪aːlijə valaːvə pæjə t̪unəhəmaːrak aɖuvan ganan bælijə jut̪ujə.",
+        "ad̪arməkarməjəhi ad̪arməkarməsaŋɲaː æt̪t̪iː nam d̪ukuɭaː ævæt̪ va."
     ],
 
     # Training
     lr=1e-4,
-    grad_clip=1.0,
-    mixed_precision=False,  # Disable mixed precision to avoid BFloat16 issues
 
     # Logging
     print_step=20,
@@ -158,6 +177,7 @@ trainer = Trainer(
     TrainerArgs(
         continue_path="",  # Set this to resume from checkpoint
         restore_path="",   # Set this to fine-tune from pretrained model
+        gpu=0,
     ),
     config,
     output_path,
