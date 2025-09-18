@@ -78,7 +78,6 @@ def word_to_initial_phonemes(word: str) -> str:
     last_vowel_idx = None
     i = 0
     L = len(word)
-    print("Processing word:", word, "length:", L)
 
     while i < L:
         ch = word[i]
@@ -135,7 +134,7 @@ def word_to_initial_phonemes(word: str) -> str:
             out.append(base)
             out.append("ə")  # schwa
             last_vowel_idx = len(out) - 1
-            print(out)
+            #print(out)
             j = i + 1
 
             if j < L and word[j] == ZWJ: j+=1  # skip ZWJ if present
@@ -215,12 +214,12 @@ def rule1_initial_schwa_to_a(tokens: List[str]) -> bool:
     if tokens[first_v_idx] != "ə":
         return False
 
-    # Exception: single CV (e.g., ['d', 'ə'])
+    # Exception: single CV
     if len(tokens) == 2 and is_consonant_token(tokens[0]) and tokens[1] == "ə":
         return False
 
     # Exception: starts with sv cluster
-    if len(tokens) >= 2 and tokens[0] == "s" and tokens[1] == "ʋ":
+    if len(tokens) >= 2 and tokens[0] == "s" and tokens[1] == "v":
         return False
 
     # Exception approximation: k ə r (if this exact sequence appears at start)
@@ -357,7 +356,6 @@ def rule8_kal_contexts(tokens: List[str]) -> bool:
             changed = True
     return changed
 
-
 def apply_all_rules(tokens: List[str]) -> List[str]:
     """
     Apply the rule set in order. Repeat the group of rules that must be
@@ -388,7 +386,6 @@ def apply_all_rules(tokens: List[str]) -> List[str]:
 
     return toks
 
-
 def tokens_to_string(tokens: List[str]) -> str:
     """
     Convert the token list back to a readable IPA string.
@@ -400,7 +397,6 @@ def tokens_to_string(tokens: List[str]) -> str:
         out.append(t)
     # Simply concatenate tokens; tokens are IPA pieces (multi-char allowed).
     return "".join(out)
-
 
 def sinhala_to_ipa(word: str) -> str:
     toks = word_to_initial_phonemes(word)
@@ -428,13 +424,20 @@ def convert_file(input_path: str, output_path: str):
     print(f"[✓] Converted {input_path} → {output_path}")
 
 if __name__ == "__main__":
-    # input_text = """මෛත‍්‍රී පාලනයක්' හදන්න ඇවිල්ලා අද මේ අය ගෙන යන්නේ තුච්ඡ, නින්දිත පාලනයක්
-    # කාටවත් ලෙඩේ නම් හොඳ කරන්න බැරි වුණා. මං වතුපිටිවල ඉස්පිරිත‍ාලෙ ළඟ ආයතනයක වැඩ කරනවා පරිගණක නිලධාරිනියක් හැටියට.
-    # අප දැක්කා නේ ජාතික වශයෙන් ව‍ූ මේ විපතේදී ඒකාබද්ධ විපක්ෂය බොරදියේ මාළු බාපු ආකාරය.
-    # මම කම්පියුටර් භාවිතා කරනවා. අම්මා ගියා, තත්ත්‍රි ගුරුත්‍රාණය කියලා කියනවා. අද 2025 දින රත්මලානේ යුර්සිටි තුළ කාර්යය තියනවා.
-    # "ශ්‍රී ලංකා" කියන රටේ නාමය ලොව පුරා ප්‍රසිද්ධයි. අපේ ක්‍යාලේජ් ළමයි නින්දිත රැකියාවක් ගැන කතා කළා.
-    # කුමරු කාර්යං කරලා ගියේ නාගරික මණ්ඩපය."""
-    # print("input:", input_text)
-    # print("output:", convert_text(input_text))
+    input_text = """මෛත‍්‍රී පාලනයක්' හදන්න ඇවිල්ලා අද මේ අය ගෙන යන්නේ තුච්ඡ, නින්දිත පාලනයක්
+    කාටවත් ලෙඩේ නම් හොඳ කරන්න බැරි වුණා. මං වතුපිටිවල ඉස්පිරිත‍ාලෙ ළඟ ආයතනයක වැඩ කරනවා පරිගණක නිලධාරිනියක් හැටියට.
+    අප දැක්කා නේ ජාතික වශයෙන් ව‍ූ මේ විපතේදී ඒකාබද්ධ විපක්ෂය බොරදියේ මාළු බාපු ආකාරය.
+    මම කම්පියුටර් භාවිතා කරනවා. අම්මා ගියා, තත්ත්‍රි ගුරුත්‍රාණය කියලා කියනවා. අද 2025 දින රත්මලානේ යුර්සිටි තුළ කාර්යය තියනවා.
+    "ශ්‍රී ලංකා" කියන රටේ නාමය ලොව පුරා ප්‍රසිද්ධයි. අපේ ක්‍යාලේජ් ළමයි නින්දිත රැකියාවක් ගැන කතා කළා.
+    කුමරු කාර්යං කරලා ගියේ නාගරික මණ්ඩපය.අම්මා 
+    අපරාධ සහ මත්ද්‍රව්‍ය නිවාරණ මෙහෙයුම් යටතේ, ඊයේ (17) දිනයේදී පුද්ගලයන් 28,172 ක් පරීක්ෂාවට ලක් කර ඇති බව පොලිසිය පවසනවා.
+    ඒ අනුව, එහිදී අපරාධ සම්බන්ධයෙන් සෘජුව පුද්ගලයන් 27 ක් හඳුනාගෙන ඇති අතර, සැකපිට පුද්ගලයන් 790 ක් අත්අඩංගුවට ගෙන ඇති බවයි පොලිසිය සඳහන් කළේ.
+    එසේම, වරෙන්තුකරුවන් 277 ක් අත්අඩංගුවට ගෙන ඇති අතර, බීමත් රියදුරන් 38 ක් සහ අපරික්ෂාකාරී රිය පැදවීම් 45 ක්ද හඳුනාගෙන ඇති බවයි පොලිසිය නිකුත් කළ වාර්තාවේ දැක්වෙන්නේ.
+    තණමල්විල ප්‍රදේශයේ පාසල් සිසුන්ට විදේශයෙන් ආනයනය කළ දුම්වැටි විකුණූ බවට සැකපිට පොලීසිය විසින් ව්‍යාපාරිකයෙක් අත්අඩංගුවට ගෙන තිබෙනවා.
+    විවිධ රසයෙන් යුත් මෙම දුම්වැටි, අදාළ ව්‍යාපාරිකයා විසින් පාසල් සිසුවෙකුට විකිණීමට ලබා දී ඇති අතර, එක් දුම්වැටියක් රුපියල් 100ක මුදලකට එම සිසුවාට ලබාදී ඇති බවත්, අදාළ පාසල් සිසුවා එම දුම්වැටි රුපියල් 200ක මුදලකට පාසලේදී විකුණා ඇති බවයි සඳහන් වන්නේ.
+    පසුව ලැබුණු තොරතුරක් මත විදුහල්පතිවරයා විසින් පරීක්ෂා කිරීමෙන් පසුව, අදාළ ව්‍යාපාරික ස්ථානය වටලා ව්‍යාපාරිකයා සතුව තිබූ දුම්වැටි 690 ක් සහ දුම්වැටි විකුණා උපයාගත් රුපියල් 36,000 ක මුදලක්ද පොලිස් භාරයට ගෙන තිබෙනවා.
+    අදාළ සැකකරු හම්බන්තොට මහේස්ත්‍රාත් අධිකරණයට ඉදිරිපත් කිරීමට නියමිත අතර, සිද්ධිය සම්බන්ධයෙන් වැඩිදුර විමර්ශන ක්‍රියාත්මකයි"""
+    print("input:", input_text)
+    print("output:", convert_text(input_text))
     # Example usage
-    convert_file("input.txt", "output_ipa.txt")
+    #convert_file("input.txt", "output_ipa.txt")
