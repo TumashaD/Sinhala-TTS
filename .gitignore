@@ -3,3 +3,9 @@
 
 # for venv
 .venv/
+
+# dataset folder
+dataset/
+
+# output folder
+output/
