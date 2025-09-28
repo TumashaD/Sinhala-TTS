@@ -46,5 +46,5 @@ if __name__ == "__main__":
     # Example usage
     # convert_file("dataset/original.csv", "phonemized.csv")
 
-    ph = phonemize("ඔබ සිතන්නේ කුමක්දැයි අපට දන්වන්න", language='si', strip=True, preserve_punctuation=True,punctuation_marks=';:,.!?¡¿—…"«»“”‘’\'"()[]{}=+-*/\\')
+    ph = phonemize("ආරම්භයේදී බංග්ලාදේශ කණ්ඩායමේ පිතිකරුවන් ශ්‍රී ලංකා පන්දු යවන්නන් හමුවේ දැඩි පීඩනයකට ලක්ව සිටි අතර, නුවන් තුෂාරගේ පළමු පන්දු වාරයේදී ම පළමු කඩුල්ල ලෙස ටන්සිඩ් හසන් දැවී ගියේ ය.", language='si', strip=True, preserve_punctuation=True,punctuation_marks=';:,.!?¡¿—…"«»“”‘’\'"()[]{}=+-*/\\')
     print(ph)
