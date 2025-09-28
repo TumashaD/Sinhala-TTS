@@ -4,8 +4,8 @@
 # for venv
 .venv/
 
-# dataset folder
-dataset/
+/dataset/
 
-# output folder
-output/
+**/.DS_Store
+
+/output/
