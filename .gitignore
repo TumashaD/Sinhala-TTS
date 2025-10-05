@@ -3,3 +3,9 @@
 
 # for venv
 .venv/
+
+/dataset/
+
+**/.DS_Store
+
+/output/
