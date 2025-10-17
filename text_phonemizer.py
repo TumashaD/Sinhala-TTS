@@ -2,8 +2,11 @@ import csv
 from phonemizer import phonemize
 from phonemizer.backend.espeak.wrapper import EspeakWrapper
 
-EspeakWrapper.set_library('C:\\Program Files\\eSpeak NG\\libespeak-ng.dll')
+# For Windows users, specify the path to the eSpeak NG DLL if needed
+# EspeakWrapper.set_library('C:\\Program Files\\eSpeak NG\\libespeak-ng.dll')
 
+# For macOS users, specify the path to the eSpeak library if needed
+EspeakWrapper.set_library('/opt/homebrew/Cellar/espeak-ng/1.52.0/lib/libespeak-ng.1.dylib')
 
 def convert_file(input_path: str, output_path: str):
     rows_to_process = []
