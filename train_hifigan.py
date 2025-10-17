@@ -7,10 +7,10 @@ from TTS.vocoder.datasets.preprocess import load_wav_data
 from TTS.vocoder.models.gan import GAN
 from TTS.config.shared_configs import BaseAudioConfig
 
-output_path = "output/hifigan_sinhala"
+output_path = "output/hifigan_Dinithi"
 
 config = hifigan_config.HifiganConfig()
-config.load_json("C:\\Users\\tumas\\AppData\\Local\\tts\\vocoder_models--en--sam--hifigan_v2\\finetune_config.json")
+config.load_json("C:\\Users\\tumas\\AppData\\Local\\tts\\vocoder_models--en--ljspeech--hifigan_v2\\finetune_config.json")
 
 ap = AudioProcessor(**config.audio)
 eval_samples, train_samples = load_wav_data(config.data_path, config.eval_split_size)
@@ -19,8 +19,7 @@ model = GAN(config,ap)
 
 trainer = Trainer(
     TrainerArgs(
-        restore_path="C:\\Users\\tumas\\AppData\\Local\\tts\\vocoder_models--en--sam--hifigan_v2\\model_file.pth",
-        continue_path="C:\\Users\\tumas\\OneDrive\\Desktop\\Sinhala-TTS\\output\\hifigan_sinhala_v2\\hifigan-September-17-2025_08+59PM-cbbc725",
+        continue_path="output/hifigan_Dinithi/hifigan-October-07-2025_05+18PM-c742b21",
         gpu=0,
     ),
     config=config,

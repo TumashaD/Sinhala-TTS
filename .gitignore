@@ -6,6 +6,10 @@
 
 /dataset/
 
+/dataset_pathnirvana/
+
+/dataset_cse/
+
 **/.DS_Store
 
 /output/

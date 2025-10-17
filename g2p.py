@@ -48,7 +48,7 @@ CONS_MAP = {
     "ත": "t̪", "ථ": "t̪", "ද": "d̪", "ධ": "d̪", "න": "n", "ඳ": "nd̪",
     "ප": "p",  "ඵ": "p",  "බ": "b",  "භ": "b",  "ම": "m", "ඹ": "mb",
     "ය": "j",  "ර": "r",  "ල": "l",  "ව": "v",  "ෆ": "f",
-    "ශ": "ʃ",  "ෂ": "ʂ",  "ස": "s",  "හ": "h",  "ළ": "ɭ",
+    "ශ": "ʃ",  "ෂ": "ʂ",  "ස": "s",  "හ": "h",  "ළ": "ɭ","ඥ": "ɲ",
 }
 
 # Helpers for regex classes (treat these as “consonant symbols” in the phoneme string)
@@ -78,7 +78,6 @@ def word_to_initial_phonemes(word: str) -> str:
     last_vowel_idx = None
     i = 0
     L = len(word)
-    print("Processing word:", word, "length:", L)
 
     while i < L:
         ch = word[i]
@@ -135,10 +134,10 @@ def word_to_initial_phonemes(word: str) -> str:
             out.append(base)
             out.append("ə")  # schwa
             last_vowel_idx = len(out) - 1
-            print(out)
             j = i + 1
 
-            if j < L and word[j] == ZWJ: j+=1  # skip ZWJ if present
+            if j < L and word[j] == ZWJ: 
+                j += 1  # skip ZWJ if present
 
             # Handle rakaransaya / yansaya
             if (
@@ -358,19 +357,25 @@ def rule8_kal_contexts(tokens: List[str]) -> bool:
     return changed
 
 
-def apply_all_rules(tokens: List[str]) -> List[str]:
+def apply_all_rules(tokens) -> List[str]:
     """
     Apply the rule set in order. Repeat the group of rules that must be
     applied until no change (these rules can trigger each other).
     """
-    # Work on a copy
-    toks = list(tokens)
+    # Convert string to list if needed
+    if isinstance(tokens, str):
+        toks = list(tokens)
+    else:
+        toks = list(tokens)
+    
     # Rule #1 once (initial schwa -> a) — paper applies just once
     _ = rule1_initial_schwa_to_a(toks)
 
     # Rules #2,#3,#4,#7 repeat until stable
+    max_iterations = 10  # Safety limit to prevent infinite loops
+    iteration = 0
     changed = True
-    while changed:
+    while changed and iteration < max_iterations:
         changed = False
         if rule2_r_context(toks):
             changed = True
@@ -380,6 +385,7 @@ def apply_all_rules(tokens: List[str]) -> List[str]:
             changed = True
         if rule7_k_r_l_u(toks):
             changed = True
+        iteration += 1
 
     # Then rule #5, #6, #8 (single final passes)
     _ = rule5_wordfinal(toks)
@@ -403,9 +409,16 @@ def tokens_to_string(tokens: List[str]) -> str:
 
 
 def sinhala_to_ipa(word: str) -> str:
-    toks = word_to_initial_phonemes(word)
-    toks2 = apply_all_rules(toks)
-    return tokens_to_string(toks2)
+    try:
+        toks = word_to_initial_phonemes(word)
+        # Convert string to list of tokens for rule processing
+        tokens = list(toks)
+        toks2 = apply_all_rules(tokens)
+        return tokens_to_string(toks2)
+    except Exception as e:
+        # If there's an error, return the original word with a marker
+        print(f"Error processing word '{word}': {e}")
+        return word
 
 def convert_text(text: str) -> str:
     text = normalize_text(text)
@@ -428,13 +441,13 @@ def convert_file(input_path: str, output_path: str):
     print(f"[✓] Converted {input_path} → {output_path}")
 
 if __name__ == "__main__":
-    # input_text = """මෛත‍්‍රී පාලනයක්' හදන්න ඇවිල්ලා අද මේ අය ගෙන යන්නේ තුච්ඡ, නින්දිත පාලනයක්
-    # කාටවත් ලෙඩේ නම් හොඳ කරන්න බැරි වුණා. මං වතුපිටිවල ඉස්පිරිත‍ාලෙ ළඟ ආයතනයක වැඩ කරනවා පරිගණක නිලධාරිනියක් හැටියට.
-    # අප දැක්කා නේ ජාතික වශයෙන් ව‍ූ මේ විපතේදී ඒකාබද්ධ විපක්ෂය බොරදියේ මාළු බාපු ආකාරය.
-    # මම කම්පියුටර් භාවිතා කරනවා. අම්මා ගියා, තත්ත්‍රි ගුරුත්‍රාණය කියලා කියනවා. අද 2025 දින රත්මලානේ යුර්සිටි තුළ කාර්යය තියනවා.
-    # "ශ්‍රී ලංකා" කියන රටේ නාමය ලොව පුරා ප්‍රසිද්ධයි. අපේ ක්‍යාලේජ් ළමයි නින්දිත රැකියාවක් ගැන කතා කළා.
-    # කුමරු කාර්යං කරලා ගියේ නාගරික මණ්ඩපය."""
-    # print("input:", input_text)
-    # print("output:", convert_text(input_text))
+    input_text = """මෛත‍්‍රී පාලනයක්' හදන්න ඇවිල්ලා අද මේ අය ගෙන යන්නේ තුච්ඡ, නින්දිත පාලනයක්
+    කාටවත් ලෙඩේ නම් හොඳ කරන්න බැරි වුණා. මං වතුපිටිවල ඉස්පිරිත‍ාලෙ ළඟ ආයතනයක වැඩ කරනවා පරිගණක නිලධාරිනියක් හැටියට.
+    අප දැක්කා නේ ජාතික වශයෙන් ව‍ූ මේ විපතේදී ඒකාබද්ධ විපක්ෂය බොරදියේ මාළු බාපු ආකාරය.
+    මම කම්පියුටර් භාවිතා කරනවා. අම්මා ගියා, තත්ත්‍රි ගුරුත්‍රාණය කියලා කියනවා. අද 2025 දින රත්මලානේ යුර්සිටි තුළ කාර්යය තියනවා.
+    "ශ්‍රී ලංකා" කියන රටේ නාමය ලොව පුරා ප්‍රසිද්ධයි. අපේ ක්‍යාලේජ් ළමයි නින්දිත රැකියාවක් ගැන කතා කළා.
+    කුමරු කාර්යං කරලා ගියේ නාගරික මණ්ඩපය."""
+    print("input:", input_text)
+    print("output:", convert_text(input_text))
     # Example usage
-    convert_file("input.txt", "output_ipa.txt")
+    # convert_file("input.txt", "output_ipa.txt")

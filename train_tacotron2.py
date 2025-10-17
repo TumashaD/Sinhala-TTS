@@ -11,16 +11,16 @@ from TTS.tts.utils.text import characters
 dataset_config = BaseDatasetConfig(
     formatter="ljspeech",  # use ljspeech-style metadata format
     meta_file_train="phonemized.csv",
-    path="dataset",
+    path="dataset_cse",
 )
 
 from TTS.tts.configs.tacotron2_config import Tacotron2Config
 
-output_path = "output/tacotron2-DDC-sinhala"
+output_path = "output/tacotron2-Dinithi3"
 
 # INITIALIZE THE TRAINING CONFIGURATION
 config = Tacotron2Config()
-config.load_json("output/tacotron2-DDC-sinhala/sinhala-ddc-September-13-2025_02+55AM-cbbc725/config.json")
+config.load_json("output\\tacotron2-Dinithi3\\config.json")
 
 # INITIALIZE THE AUDIO PROCESSOR
 ap = AudioProcessor.init_from_config(config)
@@ -45,7 +45,7 @@ model = Tacotron2(config, ap, tokenizer, speaker_manager=None)
 # INITIALIZE THE TRAINER
 trainer = Trainer(
     TrainerArgs(
-        continue_path="output/tacotron2-DDC-sinhala/sinhala-ddc-September-13-2025_02+55AM-cbbc725",
+        restore_path="output\\tacotron2-Dinithi2\\sinhala-ddc-October-03-2025_11+30PM-c742b21\\checkpoint_327500.pth",
         gpu=0,
     ),
     config,
